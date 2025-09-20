@@ -2,11 +2,11 @@
 
 # Simple FTP Client
 
-![Go](https://img.shields.io/badge/Go-1.19%2B-brightgreen?logo=go&logoColor=white)](https://go.dev/)
-![FTP](https://img.shields.io/badge/FTP-Supported-brightgreen?logo=files&logoColor=white)](https://en.wikipedia.org/wiki/File_Transfer_Protocol)
-![Go FTP](https://img.shields.io/badge/Go%20FTP-jlaffaye%2Fftp-brightgreen?logo=go&logoColor=white)](https://github.com/jlaffaye/ftp)
-![Base64](https://img.shields.io/badge/Base64-Encoding-brightgreen?logo=security&logoColor=white)](https://datatracker.ietf.org/doc/html/rfc4648)
-![Docker](https://img.shields.io/badge/Docker-Ready-brightgreen?logo=docker&logoColor=white)](https://www.docker.com/)
+![Go](https://img.shields.io/badge/Go-1.19%2B-brightgreen?logo=go&logoColor=white)(https://go.dev/)
+![FTP](https://img.shields.io/badge/FTP-Supported-brightgreen?logo=files&logoColor=white)(https://en.wikipedia.org/wiki/File_Transfer_Protocol)
+![Go FTP](https://img.shields.io/badge/Go%20FTP-jlaffaye%2Fftp-brightgreen?logo=go&logoColor=white)(https://github.com/jlaffaye/ftp)
+![Base64](https://img.shields.io/badge/Base64-Encoding-brightgreen?logo=security&logoColor=white)(https://datatracker.ietf.org/doc/html/rfc4648)
+![Docker](https://img.shields.io/badge/Docker-Ready-brightgreen?logo=docker&logoColor=white)(https://www.docker.com/)
 
 *Микросервис для загрузки файлов с FTP-серверов по логину/паролю или анонимно, реализованный на Go.*
 
