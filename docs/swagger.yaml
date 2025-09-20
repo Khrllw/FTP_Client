@@ -1,0 +1,166 @@
+basePath: /api/v1
+definitions:
+  models.FileResponse:
+    properties:
+      content_base64:
+        example: MQ0KMg0KMw0KdGVzdCBzdWNjZXNzISE=
+        type: string
+      filename:
+        example: test.txt
+        type: string
+    type: object
+  models.GetFileAnonymousRequest:
+    properties:
+      file_path:
+        example: /data/test.txt
+        type: string
+      host:
+        example: 192.168.1.1
+        type: string
+      port:
+        example: "22"
+        type: string
+    type: object
+  models.GetFileWithAuthRequest:
+    properties:
+      file_path:
+        example: /data/test.txt
+        type: string
+      host:
+        example: 192.168.1.1
+        type: string
+      password:
+        example: password
+        type: string
+      port:
+        example: "22"
+        type: string
+      username:
+        example: admin
+        type: string
+    type: object
+  swagger.IncorrectFormatError:
+    properties:
+      response:
+        properties:
+          code:
+            example: 400
+            type: integer
+          message:
+            example: Неверный формат запроса
+            type: string
+        type: object
+      status:
+        example: IncorrectFormatError
+        type: string
+    type: object
+  swagger.InternalServerError:
+    properties:
+      response:
+        properties:
+          code:
+            example: 500
+            type: integer
+          message:
+            example: Внутренняя ошибка сервера
+            type: string
+        type: object
+      status:
+        example: InternalServerError
+        type: string
+    type: object
+  swagger.NotFoundError:
+    properties:
+      response:
+        properties:
+          code:
+            example: 404
+            type: integer
+          message:
+            example: Данные не найдены
+            type: string
+        type: object
+      status:
+        example: NotFoundError
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: API для работы с протоколом FTP
+  title: FTP Client API
+  version: 1.0.0
+paths:
+  /api/v1/ftp/get/anon:
+    post:
+      consumes:
+      - application/json
+      description: Подключается к FTP-серверу как anonymous и скачивает указанный
+        файл
+      parameters:
+      - description: Адрес сервера и путь к файлу
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetFileAnonymousRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Файл успешно загружен
+          schema:
+            $ref: '#/definitions/models.FileResponse'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            $ref: '#/definitions/swagger.IncorrectFormatError'
+        "404":
+          description: Файл не найден
+          schema:
+            $ref: '#/definitions/swagger.NotFoundError'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/swagger.InternalServerError'
+      summary: Скачать файл с FTP (анонимный доступ)
+      tags:
+      - FTP
+  /api/v1/ftp/get/auth:
+    post:
+      consumes:
+      - application/json
+      description: Подключается к FTP-серверу с использованием логина и пароля, и
+        скачивает указанный файл
+      parameters:
+      - description: Параметры подключения и файл
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.GetFileWithAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Файл успешно загружен
+          schema:
+            $ref: '#/definitions/models.FileResponse'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            $ref: '#/definitions/swagger.IncorrectFormatError'
+        "404":
+          description: Файл не найден
+          schema:
+            $ref: '#/definitions/swagger.NotFoundError'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/swagger.InternalServerError'
+      summary: Скачать файл с FTP (авторизация)
+      tags:
+      - FTP
+swagger: "2.0"
