@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 
-	"ftp_service/pkg/errors"
+	"ftp_client/pkg/errors"
 	"github.com/gin-gonic/gin"
 )
 

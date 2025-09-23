@@ -1,4 +1,4 @@
-module ftp_service
+module ftp_client
 
 go 1.24
 

@@ -1,8 +1,8 @@
 package interfaces
 
 import (
-	"ftp_service/internal/domain/models"
-	"ftp_service/pkg/errors"
+	"ftp_client/internal/domain/models"
+	"ftp_client/pkg/errors"
 )
 
 type Usecases interface {
@@ -12,4 +12,5 @@ type Usecases interface {
 type FtpUsecase interface {
 	GetFileWithAuth(req models.GetFileWithAuthRequest) (*models.FileResponse, *errors.AppError)
 	GetFileAnonymous(req models.GetFileAnonymousRequest) (*models.FileResponse, *errors.AppError)
+	SendFileWithAuth(req models.SendFileRequest) *errors.AppError
 }

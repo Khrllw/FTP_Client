@@ -1,10 +1,11 @@
 package handlers
 
 import (
-	"ftp_service/internal/config"
-	"ftp_service/internal/interfaces"
-	"ftp_service/internal/middleware/logging"
-	"ftp_service/internal/middleware/swagger"
+	_ "ftp_client/docs"
+	"ftp_client/internal/config"
+	"ftp_client/internal/interfaces"
+	"ftp_client/internal/middleware/logging"
+	"ftp_client/internal/middleware/swagger"
 	"github.com/gin-gonic/gin"
 	_ "github.com/swaggo/files"
 	"net/http"
@@ -43,10 +44,15 @@ func ProvideRouter(h *Handler, cfg *config.Config, swagCfg *swagger.Config) http
 	// Общая группа для API
 	baseRouter := r.Group("/api/v1")
 
-	// Подключение
-	connectGroup := baseRouter.Group("/get")
-	connectGroup.POST("/", h.GetFileAnonymous)    // Получить файл по FTP через соединение без авторизации
-	connectGroup.POST("/auth", h.GetFileWithAuth) // Получить файл по FTP через соединение с авторизацией
+	// Получение
+	getGroup := baseRouter.Group("/get")
+	getGroup.POST("/anon", h.GetFileAnonymous) // Получить файл по FTP через соединение без авторизации
+	getGroup.POST("/auth", h.GetFileWithAuth)  // Получить файл по FTP через соединение с авторизацией
+
+	// Отправка
+	sendGroup := baseRouter.Group("/send")
+	sendGroup.POST("/anon", h.SendFileAnonymous) // Получить файл по FTP через соединение без авторизации
+	sendGroup.POST("/auth", h.SendFileWithAuth)  // Получить файл по FTP через соединение с авторизацией
 
 	return r
 }

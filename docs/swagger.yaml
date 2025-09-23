@@ -39,6 +39,36 @@ definitions:
         example: admin
         type: string
     type: object
+  models.SendFileRequest:
+    properties:
+      content_base64:
+        example: SGVsbG8sIEZUUCE=
+        type: string
+      filename:
+        example: example.txt
+        type: string
+      host:
+        example: 192.168.30.92
+        type: string
+      password:
+        example: password
+        type: string
+      port:
+        example: "21"
+        type: string
+      target_path:
+        example: upload/
+        type: string
+      username:
+        example: tester
+        type: string
+    required:
+    - content_base64
+    - filename
+    - host
+    - port
+    - target_path
+    type: object
   swagger.IncorrectFormatError:
     properties:
       response:
@@ -84,6 +114,18 @@ definitions:
         example: NotFoundError
         type: string
     type: object
+  swagger.SendResponse:
+    properties:
+      message:
+        example: MSG
+        type: string
+      status:
+        example: ok
+        type: string
+      type:
+        example: Empty
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -93,7 +135,7 @@ info:
   title: FTP Client API
   version: 1.0.0
 paths:
-  /api/v1/ftp/get/anon:
+  /get/anon:
     post:
       consumes:
       - application/json
@@ -127,8 +169,8 @@ paths:
             $ref: '#/definitions/swagger.InternalServerError'
       summary: Скачать файл с FTP (анонимный доступ)
       tags:
-      - FTP
-  /api/v1/ftp/get/auth:
+      - FTP_Anon
+  /get/auth:
     post:
       consumes:
       - application/json
@@ -162,5 +204,66 @@ paths:
             $ref: '#/definitions/swagger.InternalServerError'
       summary: Скачать файл с FTP (авторизация)
       tags:
-      - FTP
+      - FTP_Auth
+  /send/anon:
+    post:
+      consumes:
+      - application/json
+      description: Подключается к FTP-серверу как anonymous и загружает файл
+      parameters:
+      - description: Данные подключения и файл
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SendFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Файл успешно отправлен
+          schema:
+            $ref: '#/definitions/swagger.SendResponse'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            $ref: '#/definitions/swagger.IncorrectFormatError'
+        "500":
+          description: Ошибка при загрузке файла
+          schema:
+            $ref: '#/definitions/swagger.InternalServerError'
+      summary: Загрузить файл на FTP (анонимный доступ)
+      tags:
+      - FTP_Anon
+  /send/auth:
+    post:
+      consumes:
+      - application/json
+      description: Подключается к FTP-серверу с логином и паролем и загружает указанный
+        файл
+      parameters:
+      - description: Данные подключения и файл
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SendFileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Файл успешно отправлен
+          schema:
+            $ref: '#/definitions/swagger.SendResponse'
+        "400":
+          description: Неверный формат запроса
+          schema:
+            $ref: '#/definitions/swagger.IncorrectFormatError'
+        "500":
+          description: Ошибка при загрузке файла
+          schema:
+            $ref: '#/definitions/swagger.InternalServerError'
+      summary: Загрузить файл на FTP (авторизация)
+      tags:
+      - FTP_Auth
 swagger: "2.0"

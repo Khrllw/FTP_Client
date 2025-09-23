@@ -1,8 +1,8 @@
 package usecases
 
 import (
-	"ftp_service/internal/interfaces"
-	_ "ftp_service/pkg/errors"
+	"ftp_client/internal/interfaces"
+	_ "ftp_client/pkg/errors"
 )
 
 type UseCases struct {
@@ -11,6 +11,6 @@ type UseCases struct {
 
 func NewUsecases(s interfaces.FtpService) interfaces.Usecases {
 	return &UseCases{
-		NewFTPUseCase(s),
+		NewFTPUsecase(s),
 	}
 }

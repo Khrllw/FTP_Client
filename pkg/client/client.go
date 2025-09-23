@@ -5,20 +5,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"ftp_client/pkg/swagger"
 	"net/http"
-	"opc_ua_service/pkg/swagger"
 
-	"opc_ua_service/internal/domain/models"
+	"ftp_client/internal/domain/models"
 )
 
 // ClientAPI определяет интерфейс для взаимодействия с сервисом
 type ClientAPI interface {
-	CreateConnection(ctx context.Context, req *models.ConnectionRequest) (*swagger.UUIDResponse, *http.Response, error)
-	GetConnectionPool(ctx context.Context) (*swagger.GetConnectionPoolResponse, *http.Response, error)
-	DeleteConnection(ctx context.Context, req *models.UUIDRequest) (*swagger.DisconnectResponse, *http.Response, error)
-	CheckConnection(ctx context.Context, req *models.CheckConnectionRequest) (*swagger.CheckConnectionResponse, *http.Response, error)
-	StartPolling(ctx context.Context, req *models.UUIDRequest) (*swagger.PollingResponse, *http.Response, error)
-	StopPolling(ctx context.Context, req *models.UUIDRequest) (*swagger.PollingResponse, *http.Response, error)
+	GetFileWithAuth(ctx context.Context, req *models.GetFileWithAuthRequest) (*swagger.GetResponse, *http.Response, error)
+	GetFileAnonymous(ctx context.Context, req *models.GetFileAnonymousRequest) (*swagger.GetResponse, *http.Response, error)
+	SendFileWithAuth(ctx context.Context, req *models.SendFileRequest) (*swagger.SendResponse, *http.Response, error)
+	SendFileAnonymous(ctx context.Context, req *models.SendFileRequest) (*swagger.SendResponse, *http.Response, error)
 }
 
 // Client реализует интерфейс ClientAPI
@@ -33,9 +31,9 @@ func NewClient(host string) ClientAPI {
 	}
 }
 
-// CreateConnection создает новое подключение
-func (c *Client) CreateConnection(ctx context.Context, req *models.ConnectionRequest) (*swagger.UUIDResponse, *http.Response, error) {
-	const endpoint = "/api/v1/connect"
+// GetFileWithAuth скачивает файл с FTP с авторизацией
+func (c *Client) GetFileWithAuth(ctx context.Context, req *models.GetFileWithAuthRequest) (*swagger.GetResponse, *http.Response, error) {
+	const endpoint = "/api/v1/get/auth"
 
 	reqBody, err := json.Marshal(req)
 	if err != nil {
@@ -52,30 +50,7 @@ func (c *Client) CreateConnection(ctx context.Context, req *models.ConnectionReq
 		return nil, httpResp, err
 	}
 
-	var resp swagger.UUIDResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-
-		return nil, httpResp, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-	fmt.Println("Raw response body:", string(body))
-	return &resp, httpResp, nil
-}
-
-// GetConnectionPool возвращает пул активных соединений
-func (c *Client) GetConnectionPool(ctx context.Context) (*swagger.GetConnectionPoolResponse, *http.Response, error) {
-	const endpoint = "/api/v1/connect"
-
-	httpReq, err := c.service.createRequestJSONWithContext(ctx, http.MethodGet, endpoint, nil, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	body, httpResp, err := c.service.doRequest(httpReq)
-	if err != nil {
-		return nil, httpResp, err
-	}
-
-	var resp swagger.GetConnectionPoolResponse
+	var resp swagger.GetResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, httpResp, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -83,36 +58,9 @@ func (c *Client) GetConnectionPool(ctx context.Context) (*swagger.GetConnectionP
 	return &resp, httpResp, nil
 }
 
-// DeleteConnection отключает сессию по UUID
-func (c *Client) DeleteConnection(ctx context.Context, req *models.UUIDRequest) (*swagger.DisconnectResponse, *http.Response, error) {
-	const endpoint = "/api/v1/connect"
-
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to marshal request: %w", err)
-	}
-
-	httpReq, err := c.service.createRequestJSONWithContext(ctx, http.MethodDelete, endpoint, nil, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	body, httpResp, err := c.service.doRequest(httpReq)
-	if err != nil {
-		return nil, httpResp, err
-	}
-
-	var resp swagger.DisconnectResponse
-	if err := json.Unmarshal(body, &resp); err != nil {
-		return nil, httpResp, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	return &resp, httpResp, nil
-}
-
-// CheckConnection проверяет состояние соединения
-func (c *Client) CheckConnection(ctx context.Context, req *models.CheckConnectionRequest) (*swagger.CheckConnectionResponse, *http.Response, error) {
-	const endpoint = "api/v1/connect/check"
+// GetFileAnonymous скачивает файл с FTP анонимно
+func (c *Client) GetFileAnonymous(ctx context.Context, req *models.GetFileAnonymousRequest) (*swagger.GetResponse, *http.Response, error) {
+	const endpoint = "/api/v1/get/anon"
 
 	reqBody, err := json.Marshal(req)
 	if err != nil {
@@ -129,7 +77,7 @@ func (c *Client) CheckConnection(ctx context.Context, req *models.CheckConnectio
 		return nil, httpResp, err
 	}
 
-	var resp swagger.CheckConnectionResponse
+	var resp swagger.GetResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, httpResp, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -137,16 +85,16 @@ func (c *Client) CheckConnection(ctx context.Context, req *models.CheckConnectio
 	return &resp, httpResp, nil
 }
 
-// StartPolling запускает опрос OPC UA по UUID станка
-func (c *Client) StartPolling(ctx context.Context, req *models.UUIDRequest) (*swagger.PollingResponse, *http.Response, error) {
-	const endpoint = "/api/v1/polling/start"
+// SendFileWithAuth загружает файл на FTP с авторизацией
+func (c *Client) SendFileWithAuth(ctx context.Context, req *models.SendFileRequest) (*swagger.SendResponse, *http.Response, error) {
+	const endpoint = "/api/v1/send/auth"
 
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	httpReq, err := c.service.createRequestJSONWithContext(ctx, http.MethodGet, endpoint, nil, bytes.NewBuffer(reqBody))
+	httpReq, err := c.service.createRequestJSONWithContext(ctx, http.MethodPost, endpoint, nil, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -156,7 +104,7 @@ func (c *Client) StartPolling(ctx context.Context, req *models.UUIDRequest) (*sw
 		return nil, httpResp, err
 	}
 
-	var resp swagger.PollingResponse
+	var resp swagger.SendResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, httpResp, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -164,16 +112,16 @@ func (c *Client) StartPolling(ctx context.Context, req *models.UUIDRequest) (*sw
 	return &resp, httpResp, nil
 }
 
-// StopPolling останавливает опрос OPC UA по UUID станка
-func (c *Client) StopPolling(ctx context.Context, req *models.UUIDRequest) (*swagger.PollingResponse, *http.Response, error) {
-	const endpoint = "/api/v1/polling/stop"
+// SendFileAnonymous загружает файл на FTP анонимно
+func (c *Client) SendFileAnonymous(ctx context.Context, req *models.SendFileRequest) (*swagger.SendResponse, *http.Response, error) {
+	const endpoint = "/api/v1/send/anon"
 
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	httpReq, err := c.service.createRequestJSONWithContext(ctx, http.MethodGet, endpoint, nil, bytes.NewBuffer(reqBody))
+	httpReq, err := c.service.createRequestJSONWithContext(ctx, http.MethodPost, endpoint, nil, bytes.NewBuffer(reqBody))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -183,7 +131,7 @@ func (c *Client) StopPolling(ctx context.Context, req *models.UUIDRequest) (*swa
 		return nil, httpResp, err
 	}
 
-	var resp swagger.PollingResponse
+	var resp swagger.SendResponse
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, httpResp, fmt.Errorf("failed to unmarshal response: %w", err)
 	}

@@ -7,7 +7,7 @@
 // @BasePath /api/v1
 package main
 
-import "ftp_service/internal/app"
+import "ftp_client/internal/app"
 
 func main() {
 	app.New().Run()

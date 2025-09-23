@@ -18,7 +18,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/ftp/get/anon": {
+        "/get/anon": {
             "post": {
                 "description": "Подключается к FTP-серверу как anonymous и скачивает указанный файл",
                 "consumes": [
@@ -28,7 +28,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "FTP"
+                    "FTP_Anon"
                 ],
                 "summary": "Скачать файл с FTP (анонимный доступ)",
                 "parameters": [
@@ -70,7 +70,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/ftp/get/auth": {
+        "/get/auth": {
             "post": {
                 "description": "Подключается к FTP-серверу с использованием логина и пароля, и скачивает указанный файл",
                 "consumes": [
@@ -80,7 +80,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "FTP"
+                    "FTP_Auth"
                 ],
                 "summary": "Скачать файл с FTP (авторизация)",
                 "parameters": [
@@ -115,6 +115,98 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/swagger.InternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/send/anon": {
+            "post": {
+                "description": "Подключается к FTP-серверу как anonymous и загружает файл",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FTP_Anon"
+                ],
+                "summary": "Загрузить файл на FTP (анонимный доступ)",
+                "parameters": [
+                    {
+                        "description": "Данные подключения и файл",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SendFileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Файл успешно отправлен",
+                        "schema": {
+                            "$ref": "#/definitions/swagger.SendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат запроса",
+                        "schema": {
+                            "$ref": "#/definitions/swagger.IncorrectFormatError"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка при загрузке файла",
+                        "schema": {
+                            "$ref": "#/definitions/swagger.InternalServerError"
+                        }
+                    }
+                }
+            }
+        },
+        "/send/auth": {
+            "post": {
+                "description": "Подключается к FTP-серверу с логином и паролем и загружает указанный файл",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FTP_Auth"
+                ],
+                "summary": "Загрузить файл на FTP (авторизация)",
+                "parameters": [
+                    {
+                        "description": "Данные подключения и файл",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SendFileRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Файл успешно отправлен",
+                        "schema": {
+                            "$ref": "#/definitions/swagger.SendResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный формат запроса",
+                        "schema": {
+                            "$ref": "#/definitions/swagger.IncorrectFormatError"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка при загрузке файла",
                         "schema": {
                             "$ref": "#/definitions/swagger.InternalServerError"
                         }
@@ -176,6 +268,46 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "example": "admin"
+                }
+            }
+        },
+        "models.SendFileRequest": {
+            "type": "object",
+            "required": [
+                "content_base64",
+                "filename",
+                "host",
+                "port",
+                "target_path"
+            ],
+            "properties": {
+                "content_base64": {
+                    "type": "string",
+                    "example": "SGVsbG8sIEZUUCE="
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "example.txt"
+                },
+                "host": {
+                    "type": "string",
+                    "example": "192.168.30.92"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "password"
+                },
+                "port": {
+                    "type": "string",
+                    "example": "21"
+                },
+                "target_path": {
+                    "type": "string",
+                    "example": "upload/"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "tester"
                 }
             }
         },
@@ -242,6 +374,23 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "NotFoundError"
+                }
+            }
+        },
+        "swagger.SendResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "MSG"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "ok"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "Empty"
                 }
             }
         }

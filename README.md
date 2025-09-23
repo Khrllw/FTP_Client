@@ -75,6 +75,22 @@ LOGGER_SAVING_DAYS=7
 go run cmd/app/main.go
 ```
 
+### 3. Запуск приложения (Docker)
+
+```
+# Сборка
+docker build -t ftp-client:latest .
+```
+
+```
+# Запуск
+docker run --name ftp-client-container -p 8080:8080 -d ftp-client:latest
+```
+
+```
+# Остановка
+docker stop ftp-client-container
+```
 
 <div align="center">
 
@@ -109,7 +125,7 @@ Ftp_client/
 │       └── 📄 build.go                # Скрипт для сборки исполняемых файлов
 ├── 📁 build/                          # Папка с готовыми исполняемыми файлами
 ├── 📄 .env                            # Файл конфигурации
-├── 📄 docker-compose.yml              # Файл для запуска Kafka и Kafka-UI
+├── 📄 Dockerfile                      # Файл для запуска Docker
 ├── 📄 LICENSE
 └── 📄 README.md
 ```

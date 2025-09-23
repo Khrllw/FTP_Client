@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"ftp_service/internal/middleware/logging"
+	"ftp_client/internal/middleware/logging"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
